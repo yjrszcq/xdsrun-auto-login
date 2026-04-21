@@ -9,12 +9,9 @@ set -euo pipefail
 
 # ====== 内置安装配置 ======
 XDSRUN_DIR="/opt/xdsrun"
-
 XDSRUN_VERSION="1.1.3"
-XDSRUN_URL="https://github.com/NanCunChild/xdsrun-login/releases/download/v${XDSRUN_VERSION}/xdsrun_${XDSRUN_VERSION}_linux_amd64.zip"
 
 TMP_DIR="/tmp"
-ZIP_FILE="${TMP_DIR}/xdsrun_${XDSRUN_VERSION}_linux_amd64.zip"
 
 XDSRUN_BIN="${XDSRUN_DIR}/xdsrun"
 WATCHDOG_SCRIPT="${XDSRUN_DIR}/xdsrun-watchdog"
@@ -22,6 +19,12 @@ WATCHDOG_CONFIG="${XDSRUN_DIR}/xdsrun-watchdog.conf"
 
 CRON_MARK_BEGIN="# >>> xdsrun-watchdog cron >>>"
 CRON_MARK_END="# <<< xdsrun-watchdog cron <<<"
+
+# 运行时根据架构自动设置
+ARCH=""
+XDSRUN_PKG_ARCH=""
+ZIP_FILE=""
+XDSRUN_URL=""
 
 # ============================================================
 # 工具函数
@@ -84,6 +87,28 @@ detect_pkg_manager() {
     else
         echo "unknown"
     fi
+}
+
+detect_arch_and_set_url() {
+    ARCH="$(uname -m)"
+
+    case "${ARCH}" in
+        x86_64|amd64)
+            XDSRUN_PKG_ARCH="amd64"
+            ;;
+        aarch64|arm64)
+            XDSRUN_PKG_ARCH="arm64"
+            ;;
+        *)
+            err "不支持的 CPU 架构：${ARCH}。当前仅支持 x86_64/amd64 和 aarch64/arm64。"
+            ;;
+    esac
+
+    ZIP_FILE="${TMP_DIR}/xdsrun_${XDSRUN_VERSION}_linux_${XDSRUN_PKG_ARCH}.zip"
+    XDSRUN_URL="https://github.com/NanCunChild/xdsrun-login/releases/download/v${XDSRUN_VERSION}/xdsrun_${XDSRUN_VERSION}_linux_${XDSRUN_PKG_ARCH}.zip"
+
+    log "检测到系统架构：${ARCH}，将使用安装包架构：${XDSRUN_PKG_ARCH}"
+    log "下载链接：${XDSRUN_URL}"
 }
 
 install_packages() {
@@ -368,7 +393,6 @@ fi
 
 # ====== 检测网络是否在线 ======
 if ping -c "\${PING_COUNT}" -W "\${PING_TIMEOUT}" "\${PING_TARGET}" >/dev/null 2>&1; then
-    # 至少 1 个包成功，认为在线，直接退出
     exit 0
 fi
 
@@ -399,10 +423,8 @@ install_cron() {
 
     crontab -l 2>/dev/null > "${current_cron}" || true
 
-    # 删除旧的 xdsrun-watchdog 标记块
     sed -i.bak "/${CRON_MARK_BEGIN}/,/${CRON_MARK_END}/d" "${current_cron}"
 
-    # 删除所有直接包含 watchdog 路径的旧 cron 行，避免重复
     grep -v -F "${WATCHDOG_SCRIPT}" "${current_cron}" > "${current_cron}.new" || true
     mv "${current_cron}.new" "${current_cron}"
 
@@ -421,6 +443,7 @@ install_cron() {
 
 main() {
     need_root
+    detect_arch_and_set_url
     ensure_deps
     enable_cron_service
 
@@ -433,6 +456,9 @@ main() {
 
     echo
     log "安装完成。"
+    echo "系统架构：${ARCH}"
+    echo "安装包架构：${XDSRUN_PKG_ARCH}"
+    echo "下载链接：${XDSRUN_URL}"
     echo "xdsrun 程序：${XDSRUN_BIN}"
     echo "watchdog 脚本：${WATCHDOG_SCRIPT}"
     echo "watchdog 配置：${WATCHDOG_CONFIG}"
