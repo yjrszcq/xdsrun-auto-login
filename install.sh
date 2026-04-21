@@ -237,19 +237,19 @@ parse_interval_to_cron() {
 
 prompt_config() {
     echo
-    read -r -p "请输入 xdsrun 用户名 USERNAME: " INPUT_USERNAME
+    read -r -p "请输入用户名: " INPUT_USERNAME
 
     while [ -z "${INPUT_USERNAME}" ]; do
-        echo "USERNAME 不能为空。"
-        read -r -p "请输入 xdsrun 用户名 USERNAME: " INPUT_USERNAME
+        echo "用户名不能为空。"
+        read -r -p "请输入用户名: " INPUT_USERNAME
     done
 
-    read -r -s -p "请输入 xdsrun 密码 PASSWORD: " INPUT_PASSWORD
+    read -r -s -p "请输入密码: " INPUT_PASSWORD
     echo
 
     while [ -z "${INPUT_PASSWORD}" ]; do
-        echo "PASSWORD 不能为空。"
-        read -r -s -p "请输入 xdsrun 密码 PASSWORD: " INPUT_PASSWORD
+        echo "密码不能为空。"
+        read -r -s -p "请输入密码: " INPUT_PASSWORD
         echo
     done
 
