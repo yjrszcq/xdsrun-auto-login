@@ -26,6 +26,11 @@ XDSRUN_PKG_ARCH=""
 ZIP_FILE=""
 XDSRUN_URL=""
 
+# crontab 配置，由用户输入的间隔解析生成
+CRON_EXPR=""
+INTERVAL_DESC=""
+INPUT_INTERVAL=""
+
 # ============================================================
 # 工具函数
 # ============================================================
@@ -252,12 +257,20 @@ prompt_config() {
     echo "请输入 watchdog 执行间隔："
     echo "  数字+时间单位（m、h、d）"
     echo "  m 表示分钟 / h 表示小时 / d 表示天"
-    read -r -p "执行间隔: " INPUT_INTERVAL
+    read -r -p "执行间隔 [默认: 5m]: " INPUT_INTERVAL
+
+    if [ -z "${INPUT_INTERVAL}" ]; then
+        INPUT_INTERVAL="5m"
+    fi
 
     while ! parse_interval_to_cron "${INPUT_INTERVAL}"; do
         echo "执行间隔格式错误。请输入类似 5m、2h、1d 的格式。"
         echo "限制：分钟 1-59，小时 1-23，天为正整数。"
-        read -r -p "执行间隔: " INPUT_INTERVAL
+        read -r -p "执行间隔 [默认: 5m]: " INPUT_INTERVAL
+
+        if [ -z "${INPUT_INTERVAL}" ]; then
+            INPUT_INTERVAL="5m"
+        fi
     done
 }
 
