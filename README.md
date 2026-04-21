@@ -1,6 +1,6 @@
 # xdsrun 自动安装脚本
 
-本项目用于在 Linux 系统上自动安装 `xdsrun` 并配置专用的断网自动重连脚本。
+本项目用于在 Linux 系统上自动安装 [`xdsrun`](https://github.com/NanCunChild/xdsrun-login) 并配置专用的断网自动重连脚本。
 
 ## 一键安装命令
 
