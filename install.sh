@@ -91,13 +91,13 @@ install_packages() {
     local pm
     pm="$(detect_pkg_manager)"
 
-    if [ "$pm" = "unknown" ]; then
+    if [ "${pm}" = "unknown" ]; then
         err "无法识别包管理器，请手动安装：${pkgs[*]}"
     fi
 
     log "尝试安装缺失依赖：${pkgs[*]}"
 
-    case "$pm" in
+    case "${pm}" in
         apt)
             apt-get update
             apt-get install -y "${pkgs[@]}"
@@ -127,7 +127,7 @@ ensure_deps() {
         local pm
         pm="$(detect_pkg_manager)"
 
-        case "$pm" in
+        case "${pm}" in
             apt)
                 missing+=("cron")
                 ;;
@@ -161,6 +161,8 @@ enable_cron_service() {
             systemctl enable --now cron >/dev/null 2>&1 || true
         elif systemctl list-unit-files | grep -q '^crond\.service'; then
             systemctl enable --now crond >/dev/null 2>&1 || true
+        elif systemctl list-unit-files | grep -q '^cronie\.service'; then
+            systemctl enable --now cronie >/dev/null 2>&1 || true
         fi
     fi
 }
