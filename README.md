@@ -163,8 +163,8 @@ LOG_DIR="/opt/xdsrun/log"
 | `PING_TARGET`  | 用于检测网络是否在线的目标地址     | `www.baidu.com`   |
 | `PING_COUNT`   | ping 包数量            | `3`               |
 | `PING_TIMEOUT` | 每个 ping 包等待超时时间，单位秒 | `3`               |
-| `USERNAME`     | xdsrun 登录用户名        | 安装时输入             |
-| `PASSWORD`     | xdsrun 登录密码         | 安装时输入             |
+| `USERNAME`     | 西电校园网登录用户名        | 安装时输入             |
+| `PASSWORD`     | 西电校园网登录密码         | 安装时输入             |
 | `LOG_DIR`      | 日志目录                | `/opt/xdsrun/log` |
 
 ---
